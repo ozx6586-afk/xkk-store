@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XKK Store | منصة أدوات الـ Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet5" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0056b3;
+            --accent: #00d2ff;
+            --bg-dark: #0a0f1d;
+            --bg-card: rgba(15, 23, 42, 0.85);
+            --border-glass: rgba(0, 210, 255, 0.2);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --transition: all 0.3s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
+
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(10, 15, 29, 0.9); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; z-index: 1000;
+        }
+        .logo { font-size: 1.6rem; font-weight: 900; color: var(--text-main); cursor: pointer; display: flex; gap: 10px; align-items: center; }
+        .logo span { color: var(--accent); }
+        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+        .btn { padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 0.9rem; display: inline-flex; gap: 8px; align-items: center; text-decoration: none; transition: var(--transition); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 15px rgba(0, 119, 255, 0.4); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+
+        header.hero { padding: 160px 5% 40px; text-align: center; max-width: 900px; margin: 0 auto; }
+        header.hero h1 { font-size: 3rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header.hero p { color: var(--text-muted); font-size: 1.15rem; margin-bottom: 30px; }
+
+        .filter-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
+        .filter-btn { background: var(--bg-card); border: 1px solid var(--border-glass); color: var(--text-muted); padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: 600; }
+        .filter-btn.active, .filter-btn:hover { background: var(--primary); color: white; border-color: var(--accent); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5% 80px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 16px; padding: 25px; position: relative; }
+        .card-tag { display: inline-block; background: rgba(0, 210, 255, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 15px; }
+        .card h3 { font-size: 1.3rem; margin-bottom: 10px; }
+        .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
+        .card-footer { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; display: flex; justify-content: flex-end; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 17, 0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: var(--transition); }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: #0f172a; border: 1px solid var(--border-glass); width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; position: relative; }
+        .modal-close { position: absolute; top: 20px; left: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
+        .form-control { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; color: white; outline: none; }
+        
+        .dashboard-container { display: none; max-width: 1200px; margin: 120px auto; padding: 0 5%; }
+        .dashboard-container.active { display: block; }
+        table { width: 100%; border-collapse: collapse; text-align: right; margin-top: 20px; background: var(--bg-card); border-radius: 12px; overflow: hidden; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        th { color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo" onclick="switchView('store')"><i class="fa-solid fa-gamepad"></i> XKK <span>Store</span></div>
+        <ul class="nav-links">
+            <li><a href="#" class="active" onclick="switchView('store')">الرئيسية</a></li>
+            <li id="adminNavLink" style="display: none;"><a href="#" onclick="switchView('admin')">لوحة التحكم</a></li>
+        </ul>
+        <div>
+            <span id="userNameDisplay" style="margin-left: 15px; font-size: 0.9rem; color: var(--accent);"></span>
+            <button class="btn btn-outline" id="authBtn" onclick="openModal('loginModal')">تسجيل دخول</button>
+        </div>
+    </nav>
+
+    <!-- Store View -->
+    <div id="storeView">
+        <header class="hero">
+            <h1>منصة أدوات الـ Gaming الحصرية</h1>
+            <p>حمل أحدث وأقوى الأدوات لتحسين أداء الألعاب بأمان تامة.</p>
+            <div class="filter-container">
+                <button class="filter-btn active" onclick="filterCat('all', this)">الكل</button>
+                <button class="filter-btn" onclick="filterCat('Tweak', this)">Tweak</button>
+                <button class="filter-btn" onclick="filterCat('Spoof', this)">Spoof</button>
+                <button class="filter-btn" onclick="filterCat('H2a', this)">H2a</button>
+            </div>
+        </header>
+        <main class="container">
+            <div class="grid" id="toolsGrid"></div>
+        </main>
+    </div>
+
+    <!-- Admin View -->
+    <div id="adminView" class="dashboard-container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>لوحة تحكم المشرف</h2>
+            <button class="btn btn-primary" onclick="openModal('addToolModal')"><i class="fa-solid fa-plus"></i> إضافة أداة</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم الأداة</th>
+                    <th>القسم</th>
+                    <th>الملف</th>
+                    <th>الإجراء</th>
+                </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('loginModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2>تسجيل الدخول</h2>
+            <form onsubmit="handleLogin(event)" style="margin-top: 15px;">
+                <div class="form-group"><label>البريد</label><input type="email" id="loginEmail" class="form-control" required></div>
+                <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPass" class="form-control" required></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">دخول</button>
+            </form>
+            <div style="text-align: center; margin-top: 15px;"><a href="#" onclick="switchToRegister()" style="color: var(--accent); font-size: 0.85rem;">ليس لديك حساب؟ إنشاء حساب</a></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('registerModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2>حساب جديد</h2>
+            <form onsubmit="handleRegister(event)" style="margin-top: 15px;">
+                <div class="form-group"><label>الاسم</label><input type="text" id="regName" class="form-control" required></div>
+                <div class="form-group"><label>البريد</label><input type="email" id="regEmail" class="form-control" required></div>
+                <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPass" class="form-control" required></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">تسجيل</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addToolModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('addToolModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2>إضافة أداة</h2>
+            <form onsubmit="handleAddTool(event)" style="margin-top: 15px;">
+                <div class="form-group"><label>اسم الأداة</label><input type="text" id="toolName" class="form-control" required></div>
+                <div class="form-group"><label>القسم</label><select id="toolCat" class="form-control"><option value="Tweak">Tweak</option><option value="Spoof">Spoof</option><option value="H2a">H2a</option></select></div>
+                <div class="form-group"><label>الوصف</label><textarea id="toolDesc" class="form-control" required></textarea></div>
+                <div class="form-group"><label>الملف</label><input type="file" id="toolFile" class="form-control" required></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">حفظ ونشر</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let appData = { tools: [], user: null };
+        let currentFilter = 'all';
+
+        async function initApp() {
+            const res = await fetch('/api/init');
+            appData = await res.json();
+            updateUI();
+        }
+
+        function updateUI() {
+            const grid = document.getElementById('toolsGrid');
+            const adminBody = document.getElementById('adminTableBody');
+            const authBtn = document.getElementById('authBtn');
+            const adminNav = document.getElementById('adminNavLink');
+            const userDisplay = document.getElementById('userNameDisplay');
+
+            grid.innerHTML = '';
+            adminBody.innerHTML = '';
+
+            if (appData.user) {
+                userDisplay.innerText = `مرحباً، ${appData.user.name}`;
+                authBtn.innerText = 'خروج';
+                authBtn.setAttribute('onclick', 'handleLogout()');
+                if (appData.user.role === 'admin') {
+                    adminNav.style.display = 'block';
+                } else {
+                    adminNav.style.display = 'none';
+                }
+            } else {
+                userDisplay.innerText = '';
+                authBtn.innerText = 'تسجيل دخول';
+                authBtn.setAttribute('onclick', "openModal('loginModal')");
+                adminNav.style.display = 'none';
+                switchView('store');
+            }
+
+            const filtered = appData.tools.filter(t => currentFilter === 'all' || t.category === currentFilter);
+            filtered.forEach(tool => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <span class="card-tag">${tool.category}</span>
+                        <h3>${tool.name}</h3>
+                        <p>${tool.desc}</p>
+                        <div class="card-footer">
+                            <a href="${tool.filePath}" class="btn btn-primary" download><i class="fa-solid fa-download"></i> تحميل</a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            appData.tools.forEach(tool => {
+                adminBody.innerHTML += `
+                    <tr>
+                        <td>${tool.name}</td>
+                        <td>${tool.category}</td>
+                        <td>${tool.fileName}</td>
+                        <td><button class="btn btn-danger" style="padding:4px 10px; font-size:0.8rem;" onclick="deleteTool(${tool.id})">حذف</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterCat(cat, btn) {
+            currentFilter = cat;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateUI();
+        }
+
+        function switchView(view) {
+            document.getElementById('storeView').style.display = view === 'store' ? 'block' : 'none';
+            document.getElementById('adminView').classList.toggle('active', view === 'admin');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function switchToRegister() { closeModal('loginModal'); openModal('registerModal'); }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPass').value })
+            });
+            const data = await res.json();
+            if (data.success) { closeModal('loginModal'); initApp(); }
+            else { alert(data.message); }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, password: document.getElementById('regPass').value })
+            });
+            const data = await res.json();
+            if (data.success) { closeModal('registerModal'); initApp(); }
+            else { alert(data.message); }
+        }
+
+        async function handleLogout() {
+            await fetch('/api/logout', { method: 'POST' });
+            initApp();
+        }
+
+        async function handleAddTool(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('toolName').value);
+            formData.append('category', document.getElementById('toolCat').value);
+            formData.append('desc', document.getElementById('toolDesc').value);
+            formData.append('toolFile', document.getElementById('toolFile').files[0]);
+
+            const res = await fetch('/api/tools', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) { closeModal('addToolModal'); initApp(); }
+        }
+
+        async function deleteTool(id) {
+            if (confirm('هل أنت متأكد من الحذف؟')) {
+                await fetch(`/api/tools/${id}`, { method: 'DELETE' });
+                initApp();
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
