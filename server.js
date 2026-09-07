@@ -1,7 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const session = require('express-session');
-const bcrypt = require('bcrypt'); // أو بدون تشفير حسب نظامك القديم
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
@@ -28,14 +27,6 @@ db.serialize(() => {
         fileName TEXT,
         filePath TEXT
     )`);
-
-    // إنشاء حساب الأدمن الثابت تلقائياً إذا لم يكن موجوداً
-    db.get(`SELECT * FROM users WHERE email = ?`, ['admin@xkk.store'], (err, row) => {
-        if (!row) {
-            db.run(`INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)`, 
-                ['Admin', 'admin@xkk.store', 'xkkstorea3tzlklayz', 'admin']);
-        }
-    });
 });
 
 app.use(express.json());
@@ -49,7 +40,19 @@ app.use(session({
     saveUninitialized: true
 }));
 
-// API تهيئة التطبيق
+// إعداد رفع الملفات للأدوات
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = './uploads';
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
+
 app.get('/api/init', (req, res) => {
     db.all(`SELECT * FROM tools`, (err, tools) => {
         res.json({
@@ -59,9 +62,14 @@ app.get('/api/init', (req, res) => {
     });
 });
 
-// API تسجيل الدخول (يتعرف على الأدمن الثابت فوراً)
+// تسجيل الدخول (مع الاستثناء المباشر للأدمن لضمان دخوله دائماً)
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
+
+    if (email === 'admin@xkk.store' && password === 'xkkstorea3tzlklayz') {
+        req.session.user = { id: 0, name: 'Admin', email: 'admin@xkk.store', role: 'admin' };
+        return res.json({ success: true });
+    }
 
     db.get(`SELECT * FROM users WHERE email = ? AND password = ?`, [email, password], (err, user) => {
         if (user) {
@@ -73,7 +81,6 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-// API تسجيل المستخدمين الجدد (يمنع أي شخص من أخذ إيميل الأدمن)
 app.post('/api/register', (req, res) => {
     const { name, email, password } = req.body;
     if (email === 'admin@xkk.store') {
@@ -91,6 +98,31 @@ app.post('/api/register', (req, res) => {
 app.post('/api/logout', (req, res) => {
     req.session.destroy();
     res.json({ success: true });
+});
+
+app.post('/api/tools', upload.single('toolFile'), (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).json({ success: false });
+    }
+    const { name, category, desc } = req.body;
+    const file = req.file;
+    if (!file) return res.json({ success: false, message: 'الرجاء رفع الملف' });
+
+    db.run(`INSERT INTO tools (name, category, desc, fileName, filePath) VALUES (?, ?, ?, ?, ?)`,
+        [name, category, desc, file.originalname, `/uploads/${file.filename}`],
+        function(err) {
+            res.json({ success: true });
+        }
+    );
+});
+
+app.delete('/api/tools/:id', (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(403).json({ success: false });
+    }
+    db.run(`DELETE FROM tools WHERE id = ?`, [req.params.id], () => {
+        res.json({ success: true });
+    });
 });
 
 app.listen(PORT, () => {
