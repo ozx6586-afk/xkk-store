@@ -34,6 +34,14 @@ db.serialize(() => {
         action TEXT,
         time DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
+
+    // إنشاء حساب الأدمن الثابت تلقائياً إذا لم يكن موجوداً
+    db.get(`SELECT * FROM users WHERE username = ?`, ['admin@xkk.store'], (err, row) => {
+        if (!row) {
+            db.run(`INSERT INTO users (username, password, is_admin) VALUES (?, ?, 1)`, 
+                ['admin@xkk.store', 'xkkstorea3tzlklayz']);
+        }
+    });
 });
 
 app.use(express.json());
@@ -45,7 +53,6 @@ app.use(session({
     saveUninitialized: true
 }));
 
-// دالة لمعرفة الدولة عبر الأيبي
 async function getCountryFromIP(ip) {
     try {
         if (ip === '127.0.0.1' || ip === '::1') return 'Localhost';
@@ -56,23 +63,22 @@ async function getCountryFromIP(ip) {
     }
 }
 
-// تسجيل حساب جديد
+// تسجيل حساب جديد (دائماً كمستخدم عادي غير أدمن)
 app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const country = await getCountryFromIP(ip);
 
-    // جعل أول مسجل كـ أدمن افتراضياً أو حساب عادي
-    db.get(`SELECT COUNT(*) as count FROM users`, async (err, row) => {
-        const isAdmin = row.count === 0 ? 1 : 0; // أول شخص يسجل يصير أدمن تلقائياً
+    if (username === 'admin@xkk.store') {
+        return res.json({ success: false, message: 'هذا الاسم محجوز للمشرف الرئيسي!' });
+    }
 
-        db.run(`INSERT INTO users (username, password, is_admin) VALUES (?, ?, ?)`, [username, password, isAdmin], function(err) {
-            if (err) {
-                return res.json({ success: false, message: 'اسم المستخدم مستخدم مسبقاً!' });
-            }
-            db.run(`INSERT INTO logs (username, ip, country, action) VALUES (?, ?, ?, ?)`, [username, ip, country, 'Register']);
-            res.json({ success: true });
-        });
+    db.run(`INSERT INTO users (username, password, is_admin) VALUES (?, ?, 0)`, [username, password], function(err) {
+        if (err) {
+            return res.json({ success: false, message: 'اسم المستخدم مستخدم مسبقاً!' });
+        }
+        db.run(`INSERT INTO logs (username, ip, country, action) VALUES (?, ?, ?, ?)`, [username, ip, country, 'Register']);
+        res.json({ success: true });
     });
 });
 
@@ -93,7 +99,6 @@ app.post('/api/login', async (req, res) => {
     });
 });
 
-// التحقق من حالة المستخدم الحالي
 app.get('/api/check-session', (req, res) => {
     if (req.session.user) {
         res.json({ loggedIn: true, username: req.session.user.username, isAdmin: req.session.user.is_admin === 1 });
@@ -102,13 +107,11 @@ app.get('/api/check-session', (req, res) => {
     }
 });
 
-// تسجيل خروج
 app.get('/api/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
 });
 
-// زيادة عدد تنزيلات أداة معينة
 app.post('/api/download', (req, res) => {
     const { tool_name } = req.body;
     db.get(`SELECT * FROM downloads WHERE tool_name = ?`, [tool_name], (err, row) => {
@@ -124,10 +127,9 @@ app.post('/api/download', (req, res) => {
     });
 });
 
-// لوحة التحكم الخاصة بالأدمن (تعرض المستخدمين، الأيبي، الدول، والتحميلات)
 app.get('/api/admin-data', (req, res) => {
     if (!req.session.user || req.session.user.is_admin !== 1) {
-        return res.status(403).json({ error: 'غير مسموح لك بالوصول (للمشرفين فقط)' });
+        return res.status(403).json({ error: 'غير مسموح لك بالوصول' });
     }
 
     db.all(`SELECT username FROM users`, (err, users) => {
