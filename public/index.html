@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XKK Store | منصة أدوات الـ Gaming</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet5" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -129,7 +128,7 @@
             <button class="modal-close" onclick="closeModal('loginModal')"><i class="fa-solid fa-xmark"></i></button>
             <h2>تسجيل الدخول</h2>
             <form onsubmit="handleLogin(event)" style="margin-top: 15px;">
-                <div class="form-group"><label>البريد</label><input type="email" id="loginEmail" class="form-control" required></div>
+                <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="loginEmail" class="form-control" value="admin@xkk.store" required></div>
                 <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPass" class="form-control" required></div>
                 <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">دخول</button>
             </form>
@@ -188,7 +187,7 @@
                 userDisplay.innerText = `مرحباً، ${appData.user.name}`;
                 authBtn.innerText = 'خروج';
                 authBtn.setAttribute('onclick', 'handleLogout()');
-                if (appData.user.role === 'admin') {
+                if (appData.user.role === 'admin' || appData.user.email === 'admin@xkk.store') {
                     adminNav.style.display = 'block';
                 } else {
                     adminNav.style.display = 'none';
@@ -245,10 +244,13 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            const emailInput = document.getElementById('loginEmail').value;
+            const passInput = document.getElementById('loginPass').value;
+
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPass').value })
+                body: JSON.stringify({ email: emailInput, password: passInput })
             });
             const data = await res.json();
             if (data.success) { closeModal('loginModal'); initApp(); }
@@ -257,10 +259,18 @@
 
         async function handleRegister(e) {
             e.preventDefault();
+            const emailInput = document.getElementById('regEmail').value;
+            
+            // منع أي شخص آخر من التسجيل بهذا الإيميل المخصص للادمن
+            if (emailInput === 'admin@xkk.store') {
+                alert('هذا البريد الإلكتروني محجوز للمشرف الرئيسي ولا يمكن التسجيل به!');
+                return;
+            }
+
             const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, password: document.getElementById('regPass').value })
+                body: JSON.stringify({ name: document.getElementById('regName').value, email: emailInput, password: document.getElementById('regPass').value })
             });
             const data = await res.json();
             if (data.success) { closeModal('registerModal'); initApp(); }
