@@ -29,19 +29,12 @@
             overflow-x: hidden;
         }
 
-        /* خلفية متحركة خفيفة وساحرة */
         .bg-glow {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             background: radial-gradient(circle at 50% 20%, rgba(0, 86, 179, 0.15), transparent 50%),
                         radial-gradient(circle at 80% 80%, rgba(0, 210, 255, 0.1), transparent 40%);
-            animation: pulseGlow 8s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.05); opacity: 1; }
         }
 
         nav {
@@ -81,7 +74,6 @@
         .download-count { font-size: 0.85rem; color: var(--accent); margin-bottom: 15px; display: block; font-weight: 600; }
         .card-footer { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; display: flex; justify-content: flex-end; }
 
-        /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 17, 0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: var(--transition); }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal { background: #0f172a; border: 1px solid var(--border-glass); width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; position: relative; }
@@ -91,7 +83,6 @@
         .form-control { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; color: white; outline: none; }
         .form-control:focus { border-color: var(--accent); }
         
-        /* لوحة تحكم الأدمن الخاصة */
         .dashboard-container { display: none; max-width: 1200px; margin: 120px auto; padding: 0 5%; }
         .dashboard-container.active { display: block; }
         table { width: 100%; border-collapse: collapse; text-align: right; margin-top: 20px; background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-glass); }
@@ -129,14 +120,14 @@
         </header>
         <main class="container">
             <div class="grid" id="toolsGrid">
-                <!-- الأدوات التجريبية مع التصنيفات المعتمدة -->
+                <!-- الأقسام الثلاثة المطلوبة حصرياً: Tweak, Spoof, H2a -->
                 <div class="card" data-category="Tweak">
                     <span class="card-tag">Tweak</span>
                     <h3>أداة تحسين استجابة النظام</h3>
                     <p>تقليل البنق ورفع إطارات الألعاب بأعلى كفاءة واستقرار تام.</p>
                     <span class="download-count" id="count-Tweak">عدد التنزيلات: 0</span>
                     <div class="card-footer">
-                        <button class="btn btn-primary" onclick="downloadTool('أداة تحسين استجابة النظام')"><i class="fa-solid fa-download"></i> تحميل</button>
+                        <button class="btn btn-primary" onclick="downloadTool('Tweak')"><i class="fa-solid fa-download"></i> تحميل</button>
                     </div>
                 </div>
 
@@ -146,7 +137,7 @@
                     <p>تغيير وتشفير بيانات الهاردوير للحفاظ على الأمان والخصوصية المطلقة.</p>
                     <span class="download-count" id="count-Spoof">عدد التنزيلات: 0</span>
                     <div class="card-footer">
-                        <button class="btn btn-primary" onclick="downloadTool('أداة حماية الهاردوير المتقدمة')"><i class="fa-solid fa-download"></i> تحميل</button>
+                        <button class="btn btn-primary" onclick="downloadTool('Spoof')"><i class="fa-solid fa-download"></i> تحميل</button>
                     </div>
                 </div>
 
@@ -156,14 +147,14 @@
                     <p>أداة مخصصة لتنظيم ملفات اللعبة وتحسين الأداء العام للبطولات.</p>
                     <span class="download-count" id="count-H2a">عدد التنزيلات: 0</span>
                     <div class="card-footer">
-                        <button class="btn btn-primary" onclick="downloadTool('أداة التعديل الفائق H2a')"><i class="fa-solid fa-download"></i> تحميل</button>
+                        <button class="btn btn-primary" onclick="downloadTool('H2a')"><i class="fa-solid fa-download"></i> تحميل</button>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Admin View (يظهر فقط للأدمن) -->
+    <!-- Admin View -->
     <div id="adminView" class="dashboard-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>لوحة تحكم المشرف (سجلات المستخدمين، الأيبي، والدول)</h2>
@@ -179,7 +170,6 @@
                 </tr>
             </thead>
             <tbody id="adminLogsBody">
-                <!-- تعبئة ديناميكية -->
             </tbody>
         </table>
     </div>
@@ -193,19 +183,6 @@
                 <div class="form-group"><label>اسم المستخدم</label><input type="text" id="loginUser" class="form-control" required></div>
                 <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPass" class="form-control" required></div>
                 <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">دخول</button>
-            </form>
-            <div style="text-align: center; margin-top: 15px;"><a href="#" onclick="switchToRegister()" style="color: var(--accent); font-size: 0.85rem; text-decoration: none;">ليس لديك حساب؟ إنشاء حساب جديد</a></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="registerModal">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('registerModal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2>إنشاء حساب جديد</h2>
-            <form onsubmit="handleRegister(event)" style="margin-top: 15px;">
-                <div class="form-group"><label>اسم المستخدم</label><input type="text" id="regUser" class="form-control" required></div>
-                <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPass" class="form-control" required></div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">تسجيل الحساب</button>
             </form>
         </div>
     </div>
@@ -266,7 +243,6 @@
 
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        function switchToRegister() { closeModal('loginModal'); openModal('registerModal'); }
 
         async function handleLogin(e) {
             e.preventDefault();
@@ -280,25 +256,13 @@
             else { alert(data.message); }
         }
 
-        async function handleRegister(e) {
-            e.preventDefault();
-            const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: document.getElementById('regUser').value, password: document.getElementById('regPass').value })
-            });
-            const data = await res.json();
-            if (data.success) { closeModal('registerModal'); location.reload(); }
-            else { alert(data.message); }
-        }
-
-        async function downloadTool(toolName) {
+        async function downloadTool(toolCat) {
             await fetch('/api/download', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tool_name: toolName })
+                body: JSON.stringify({ tool_name: toolCat })
             });
-            alert(`جاري تحميل ${toolName} بنجاح!`);
+            alert(`جاري تحميل أداة الـ ${toolCat} بنجاح!`);
             location.reload();
         }
 
@@ -319,18 +283,8 @@
             `).join('');
 
             data.downloads.forEach(d => {
-                const countEl = document.getElementById(`count-${d.tool_name.includes('استجابة') ? 'Tweak' : d.tool_name.includes('حماية') ? 'Spoof' : 'H2a'}`);
-                // أو البحث المرن بالاسم
-            });
-            
-            // تحديث العدادات بدقة حسب أسماء الأدوات
-            data.downloads.forEach(d => {
-                const cards = document.querySelectorAll('.card');
-                cards.forEach(card => {
-                    if (card.querySelector('h3').innerText === d.tool_name) {
-                        card.querySelector('.download-count').innerText = `عدد التنزيلات: ${d.count}`;
-                    }
-                });
+                const countEl = document.getElementById(`count-${d.tool_name}`);
+                if (countEl) countEl.innerText = `عدد التنزيلات: ${d.count}`;
             });
         }
 
