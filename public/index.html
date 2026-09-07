@@ -56,7 +56,6 @@
         .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
         .card-footer { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; display: flex; justify-content: flex-end; }
 
-        /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 17, 0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: var(--transition); }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal { background: #0f172a; border: 1px solid var(--border-glass); width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; position: relative; }
@@ -244,13 +243,10 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            const emailInput = document.getElementById('loginEmail').value;
-            const passInput = document.getElementById('loginPass').value;
-
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: emailInput, password: passInput })
+                body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPass').value })
             });
             const data = await res.json();
             if (data.success) { closeModal('loginModal'); initApp(); }
@@ -260,10 +256,8 @@
         async function handleRegister(e) {
             e.preventDefault();
             const emailInput = document.getElementById('regEmail').value;
-            
-            // منع أي شخص آخر من التسجيل بهذا الإيميل المخصص للادمن
             if (emailInput === 'admin@xkk.store') {
-                alert('هذا البريد الإلكتروني محجوز للمشرف الرئيسي ولا يمكن التسجيل به!');
+                alert('هذا البريد الإلكتروني محجوز للمشرف الرئيسي!');
                 return;
             }
 
@@ -272,7 +266,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: document.getElementById('regName').value, email: emailInput, password: document.getElementById('regPass').value })
             });
-            const data = await res.json();
+            const data = andres = await res.json();
             if (data.success) { closeModal('registerModal'); initApp(); }
             else { alert(data.message); }
         }
