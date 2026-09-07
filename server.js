@@ -1,157 +1,144 @@
 const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
 const session = require('express-session');
-const multer = require('multer');
+const axios = require('axios');
 const path = require('path');
-const fs = require('fs');
-const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// إعداد التخزين لرفع الملفات
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, 'public/uploads');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
+// إعداد قاعدة البيانات
+const db = new sqlite3.Database('./database.db', (err) => {
+    if (err) console.error('Database opening error: ', err);
 });
-const upload = multer({ storage: storage });
+
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT,
+        is_admin INTEGER DEFAULT 0
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS downloads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tool_name TEXT,
+        count INTEGER DEFAULT 0
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        ip TEXT,
+        country TEXT,
+        action TEXT,
+        time DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(session({
-    secret: 'xkk_super_secret_key_9988',
+    secret: 'xkk_super_secret_key',
     resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // يوم كامل
+    saveUninitialized: true
 }));
 
-// قاعدة بيانات وهمية (ملف JSON لحفظ البيانات والاعتمادية)
-const DB_FILE = path.join(__dirname, 'database.json');
-
-function getDB() {
-    if (!fs.existsSync(DB_FILE)) {
-        const initialData = {
-            users: [
-                { id: 1, name: 'AdminXKK', email: 'admin@xkk.store', passwordHash: bcrypt.hashSync('xkkstorea3tzlklayz', 10), role: 'admin' },
-                { id: 2, name: 'GamerPro', email: 'gamer@example.com', passwordHash: bcrypt.hashSync('123456', 10), role: 'user' }
-            ],
-            tools: []
-        };
-        fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
+// دالة لمعرفة الدولة عبر الأيبي
+async function getCountryFromIP(ip) {
+    try {
+        if (ip === '127.0.0.1' || ip === '::1') return 'Localhost';
+        const response = await axios.get(`http://ip-api.com/json/${ip}`);
+        return response.data.country || 'Unknown';
+    } catch (e) {
+        return 'Unknown';
     }
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
 }
 
-function saveDB(data) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-}
+// تسجيل حساب جديد
+app.post('/api/register', async (req, res) => {
+    const { username, password } = req.body;
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const country = await getCountryFromIP(ip);
 
-// تهيئة قاعدة البيانات عند البدء
-getDB();
+    // جعل أول مسجل كـ أدمن افتراضياً أو حساب عادي
+    db.get(`SELECT COUNT(*) as count FROM users`, async (err, row) => {
+        const isAdmin = row.count === 0 ? 1 : 0; // أول شخص يسجل يصير أدمن تلقائياً
 
-// Endpoints (APIs)
-// جلب الأدوات والمستخدم الحالي
-app.get('/api/init', (req, res) => {
-    const db = getDB();
-    res.json({
-        tools: db.tools,
-        user: req.session.user || null
+        db.run(`INSERT INTO users (username, password, is_admin) VALUES (?, ?, ?)`, [username, password, isAdmin], function(err) {
+            if (err) {
+                return res.json({ success: false, message: 'اسم المستخدم مستخدم مسبقاً!' });
+            }
+            db.run(`INSERT INTO logs (username, ip, country, action) VALUES (?, ?, ?, ?)`, [username, ip, country, 'Register']);
+            res.json({ success: true });
+        });
     });
 });
 
 // تسجيل الدخول
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    const db = getDB();
-    const user = db.users.find(u => u.email === email);
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const country = await getCountryFromIP(ip);
 
-    if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
-        return res.status(400).json({ success: false, message: 'البريد أو كلمة المرور غير صحيحة!' });
-    }
-
-    req.session.user = { id: user.id, name: user.name, email: user.email, role: user.role };
-    res.json({ success: true, user: req.session.user });
+    db.get(`SELECT * FROM users WHERE username = ? AND password = ?`, [username, password], (err, user) => {
+        if (user) {
+            req.session.user = user;
+            db.run(`INSERT INTO logs (username, ip, country, action) VALUES (?, ?, ?, ?)`, [username, ip, country, 'Login']);
+            res.json({ success: true, isAdmin: user.is_admin === 1 });
+        } else {
+            res.json({ success: false, message: 'خطأ في اسم المستخدم أو كلمة المرور' });
+        }
+    });
 });
 
-// إنشاء حساب جديد
-app.post('/api/register', (req, res) => {
-    const { name, email, password } = req.body;
-    const db = getDB();
-
-    if (db.users.find(u => u.email === email)) {
-        return res.status(400).json({ success: false, message: 'البريد الإلكتروني مستخدم مسبقاً!' });
+// التحقق من حالة المستخدم الحالي
+app.get('/api/check-session', (req, res) => {
+    if (req.session.user) {
+        res.json({ loggedIn: true, username: req.session.user.username, isAdmin: req.session.user.is_admin === 1 });
+    } else {
+        res.json({ loggedIn: false });
     }
-
-    const newUser = {
-        id: db.users.length + 1,
-        name,
-        email,
-        passwordHash: bcrypt.hashSync(password, 10),
-        role: 'user'
-    };
-
-    db.users.push(newUser);
-    saveDB(db);
-
-    req.session.user = { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role };
-    res.json({ success: true, user: req.session.user });
 });
 
-// تسجيل الخروج
-app.post('/api/logout', (req, res) => {
+// تسجيل خروج
+app.get('/api/logout', (req, res) => {
     req.session.destroy();
-    res.json({ success: true });
+    res.redirect('/');
 });
 
-// إضافة أداة (للمشرف فقط)
-app.post('/api/tools', upload.single('toolFile'), (req, res) => {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: 'غير مصرح لك بذلك!' });
-    }
-
-    const { name, category, desc } = req.body;
-    const fileName = req.file ? req.file.originalname : 'no-file.zip';
-    const filePath = req.file ? `/uploads/${req.file.filename}` : '#';
-
-    const db = getDB();
-    const newTool = {
-        id: Date.now(),
-        name,
-        category,
-        desc,
-        fileName,
-        filePath
-    };
-
-    db.tools.push(newTool);
-    saveDB(db);
-
-    res.json({ success: true, tool: newTool });
+// زيادة عدد تنزيلات أداة معينة
+app.post('/api/download', (req, res) => {
+    const { tool_name } = req.body;
+    db.get(`SELECT * FROM downloads WHERE tool_name = ?`, [tool_name], (err, row) => {
+        if (row) {
+            db.run(`UPDATE downloads SET count = count + 1 WHERE tool_name = ?`, [tool_name], () => {
+                res.json({ success: true });
+            });
+        } else {
+            db.run(`INSERT INTO downloads (tool_name, count) VALUES (?, 1)`, [tool_name], () => {
+                res.json({ success: true });
+            });
+        }
+    });
 });
 
-// حذف أداة (للمشرف فقط)
-app.delete('/api/tools/:id', (req, res) => {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: 'غير مصرح لك بذلك!' });
+// لوحة التحكم الخاصة بالأدمن (تعرض المستخدمين، الأيبي، الدول، والتحميلات)
+app.get('/api/admin-data', (req, res) => {
+    if (!req.session.user || req.session.user.is_admin !== 1) {
+        return res.status(403).json({ error: 'غير مسموح لك بالوصول (للمشرفين فقط)' });
     }
 
-    const db = getDB();
-    const toolId = parseInt(req.params.id);
-    db.tools = db.tools.filter(t => t.id !== toolId);
-    saveDB(db);
-
-    res.json({ success: true });
+    db.all(`SELECT username FROM users`, (err, users) => {
+        db.all(`SELECT * FROM downloads`, (err, downloads) => {
+            db.all(`SELECT * FROM logs ORDER BY id DESC`, (err, logs) => {
+                res.json({ users, downloads, logs });
+            });
+        });
+    });
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
