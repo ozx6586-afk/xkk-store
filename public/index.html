@@ -3,296 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XKK Store | منصة أدوات الـ Gaming</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet5" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>متجر XKK الشامل</title>
+    <!-- استدعاء خط عربي أنيق -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #0056b3;
-            --accent: #00d2ff;
-            --bg-dark: #0a0f1d;
-            --bg-card: rgba(15, 23, 42, 0.85);
-            --border-glass: rgba(0, 210, 255, 0.2);
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --transition: all 0.3s ease;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
-
-        nav {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(10, 15, 29, 0.9); backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-glass);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5%; z-index: 1000;
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
-        .logo { font-size: 1.6rem; font-weight: 900; color: var(--text-main); cursor: pointer; display: flex; gap: 10px; align-items: center; }
-        .logo span { color: var(--accent); }
-        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
-        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 600; cursor: pointer; }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
 
-        .btn { padding: 8px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 0.9rem; display: inline-flex; gap: 8px; align-items: center; text-decoration: none; transition: var(--transition); }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; box-shadow: 0 4px 15px rgba(0, 119, 255, 0.4); }
-        .btn-outline { background: transparent; border: 1px solid var(--border-glass); color: white; }
-        .btn-danger { background: #ef4444; color: white; }
+        /* خلفية متحركة خفيفة */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(125deg, #0f172a, #1e1b4b, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
 
-        header.hero { padding: 160px 5% 40px; text-align: center; max-width: 900px; margin: 0 auto; }
-        header.hero h1 { font-size: 3rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        header.hero p { color: var(--text-muted); font-size: 1.15rem; margin-bottom: 30px; }
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.5;
+        }
 
-        .filter-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
-        .filter-btn { background: var(--bg-card); border: 1px solid var(--border-glass); color: var(--text-muted); padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: 600; }
-        .filter-btn.active, .filter-btn:hover { background: var(--primary); color: white; border-color: var(--accent); }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 5% 80px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
-        .card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 16px; padding: 25px; position: relative; }
-        .card-tag { display: inline-block; background: rgba(0, 210, 255, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 15px; }
-        .card h3 { font-size: 1.3rem; margin-bottom: 10px; }
-        .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
-        .card-footer { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; display: flex; justify-content: flex-end; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-        /* Modals */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 8, 17, 0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: var(--transition); }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal { background: #0f172a; border: 1px solid var(--border-glass); width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; position: relative; }
-        .modal-close { position: absolute; top: 20px; left: 20px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
-        .form-control { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; color: white; outline: none; }
-        
-        .dashboard-container { display: none; max-width: 1200px; margin: 120px auto; padding: 0 5%; }
-        .dashboard-container.active { display: block; }
-        table { width: 100%; border-collapse: collapse; text-align: right; margin-top: 20px; background: var(--bg-card); border-radius: 12px; overflow: hidden; }
-        th, td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        th { color: var(--text-muted); }
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .user-panel {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button, .btn {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e11d48, #be123c);
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #f1f5f9;
+        }
+
+        .tool-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .download-count {
+            font-size: 13px;
+            color: #38bdf8;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* لوحة التحكم الخاصة بالأدمن */
+        .admin-section {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid #38bdf8;
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 50px;
+            display: none;
+        }
+
+        .admin-section h2 {
+            color: #38bdf8;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        th {
+            color: #38bdf8;
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        /* النوافذ المنبثقة (Modals) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #f8fafc;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 15px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #38bdf8;
+        }
+
+        .close-btn {
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            cursor: pointer;
+            float: left;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo" onclick="switchView('store')"><i class="fa-solid fa-gamepad"></i> XKK <span>Store</span></div>
-        <ul class="nav-links">
-            <li><a href="#" class="active" onclick="switchView('store')">الرئيسية</a></li>
-            <li id="adminNavLink" style="display: none;"><a href="#" onclick="switchView('admin')">لوحة التحكم</a></li>
-        </ul>
-        <div>
-            <span id="userNameDisplay" style="margin-left: 15px; font-size: 0.9rem; color: var(--accent);"></span>
-            <button class="btn btn-outline" id="authBtn" onclick="openModal('loginModal')">تسجيل دخول</button>
-        </div>
-    </nav>
+    <div class="bg-animation"></div>
 
-    <!-- Store View -->
-    <div id="storeView">
-        <header class="hero">
-            <h1>منصة أدوات الـ Gaming الحصرية</h1>
-            <p>حمل أحدث وأقوى الأدوات لتحسين أداء الألعاب بأمان تامة.</p>
-            <div class="filter-container">
-                <button class="filter-btn active" onclick="filterCat('all', this)">الكل</button>
-                <button class="filter-btn" onclick="filterCat('Tweak', this)">Tweak</button>
-                <button class="filter-btn" onclick="filterCat('Spoof', this)">Spoof</button>
-                <button class="filter-btn" onclick="filterCat('H2a', this)">H2a</button>
+    <header>
+        <div class="logo">XKK STORE</div>
+        <div class="user-panel" id="userPanel">
+            <!-- سيتم تعبئتها برمجياً بناءً على حالة تسجيل الدخول -->
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>مرحباً بك في منصة الأدوات والخدمات الذكية</h1>
+            <p>جميع الأدوات الرقمية التي تحتاجها في مكان واحد وبأعلى كفاءة</p>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card">
+                <h3>أداة تحويل الملفات السريعة</h3>
+                <p>قم بتحويل صيغ المستندات والصور بضغطة زر واحدة بكل سهولة وأمان.</p>
+                <span class="download-count" id="count-tool1">عدد التنزيلات: 0</span>
+                <button onclick="downloadTool('أداة تحويل الملفات السريعة')">تحميل الأداة</button>
             </div>
-        </header>
-        <main class="container">
-            <div class="grid" id="toolsGrid"></div>
-        </main>
-    </div>
 
-    <!-- Admin View -->
-    <div id="adminView" class="dashboard-container">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>لوحة تحكم المشرف</h2>
-            <button class="btn btn-primary" onclick="openModal('addToolModal')"><i class="fa-solid fa-plus"></i> إضافة أداة</button>
+            <div class="tool-card">
+                <h3>أداة فحص الأمان والحماية</h3>
+                <p>تحقق من أمان وحماية ملفاتك واكتشاف الثغرات بذكاء اصطناعي.</p>
+                <span class="download-count" id="count-tool2">عدد التنزيلات: 0</span>
+                <button onclick="downloadTool('أداة فحص الأمان والحماية')">تحميل الأداة</button>
+            </div>
+
+            <div class="tool-card">
+                <h3>أداة تحليل البيانات والتقارير</h3>
+                <p>أنشئ تقارير إحصائية دقيقة ورسوم بيانية احترافية لبياناتك.</p>
+                <span class="download-count" id="count-tool3">عدد التنزيلات: 0</span>
+                <button onclick="downloadTool('أداة تحليل البيانات والتقارير')">تحميل الأداة</button>
+            </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>اسم الأداة</th>
-                    <th>القسم</th>
-                    <th>الملف</th>
-                    <th>الإجراء</th>
-                </tr>
-            </thead>
-            <tbody id="adminTableBody"></tbody>
-        </table>
-    </div>
 
-    <!-- Modals -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('loginModal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2>تسجيل الدخول</h2>
-            <form onsubmit="handleLogin(event)" style="margin-top: 15px;">
-                <div class="form-group"><label>البريد</label><input type="email" id="loginEmail" class="form-control" required></div>
-                <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPass" class="form-control" required></div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">دخول</button>
-            </form>
-            <div style="text-align: center; margin-top: 15px;"><a href="#" onclick="switchToRegister()" style="color: var(--accent); font-size: 0.85rem;">ليس لديك حساب؟ إنشاء حساب</a></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="registerModal">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('registerModal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2>حساب جديد</h2>
-            <form onsubmit="handleRegister(event)" style="margin-top: 15px;">
-                <div class="form-group"><label>الاسم</label><input type="text" id="regName" class="form-control" required></div>
-                <div class="form-group"><label>البريد</label><input type="email" id="regEmail" class="form-control" required></div>
-                <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPass" class="form-control" required></div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">تسجيل</button>
-            </form>
+        <!-- لوحة تحكم الأدمن (تظهر فقط للأدمن) -->
+        <div class="admin-section" id="adminSection">
+            <h2>لوحة تحكم المشرف (Admin Dashboard)</h2>
+            
+            <h3 style="margin-top: 20px; color: #38bdf8; font-size: 16px;">سجلات دخول وتسجيل المستخدمين (IP & Country)</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المستخدم</th>
+                            <th>عنوان IP</th>
+                            <th>الدولة</th>
+                            <th>النشاط</th>
+                            <th>الوقت والتاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTable">
+                        <!-- تُعبأ ديناميكياً -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="addToolModal">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('addToolModal')"><i class="fa-solid fa-xmark"></i></button>
-            <h2>إضافة أداة</h2>
-            <form onsubmit="handleAddTool(event)" style="margin-top: 15px;">
-                <div class="form-group"><label>اسم الأداة</label><input type="text" id="toolName" class="form-control" required></div>
-                <div class="form-group"><label>القسم</label><select id="toolCat" class="form-control"><option value="Tweak">Tweak</option><option value="Spoof">Spoof</option><option value="H2a">H2a</option></select></div>
-                <div class="form-group"><label>الوصف</label><textarea id="toolDesc" class="form-control" required></textarea></div>
-                <div class="form-group"><label>الملف</label><input type="file" id="toolFile" class="form-control" required></div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">حفظ ونشر</button>
-            </form>
+    <!-- نافذة تسجيل الدخول / التسجيل -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">تسجيل الدخول</h3>
+            <div class="form-group">
+                <label>اسم المستخدم</label>
+                <input type="text" id="usernameInput" placeholder="أدخل اسم المستخدم">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور">
+            </div>
+            <button style="width: 100%; margin-top: 10px;" onclick="submitAuth()">تنفيذ</button>
         </div>
     </div>
 
     <script>
-        let appData = { tools: [], user: null };
-        let currentFilter = 'all';
+        let isRegisterMode = false;
 
-        async function initApp() {
-            const res = await fetch('/api/init');
-            appData = await res.json();
-            updateUI();
-        }
-
-        function updateUI() {
-            const grid = document.getElementById('toolsGrid');
-            const adminBody = document.getElementById('adminTableBody');
-            const authBtn = document.getElementById('authBtn');
-            const adminNav = document.getElementById('adminNavLink');
-            const userDisplay = document.getElementById('userNameDisplay');
-
-            grid.innerHTML = '';
-            adminBody.innerHTML = '';
-
-            if (appData.user) {
-                userDisplay.innerText = `مرحباً، ${appData.user.name}`;
-                authBtn.innerText = 'خروج';
-                authBtn.setAttribute('onclick', 'handleLogout()');
-                if (appData.user.role === 'admin') {
-                    adminNav.style.display = 'block';
-                } else {
-                    adminNav.style.display = 'none';
+        // التحقق من حالة الجلسة عند فتح الموقع
+        async function checkSession() {
+            const res = await fetch('/api/check-session');
+            const data = await res.json();
+            const panel = document.getElementById('userPanel');
+            
+            if (data.loggedIn) {
+                panel.innerHTML = `
+                    <span style="font-weight:600; color: #38bdf8;">مرحباً، ${data.username}</span>
+                    <a href="/api/logout"><button class="btn-danger">تسجيل خروج</button></a>
+                `;
+                if (data.isAdmin) {
+                    document.getElementById('adminSection').style.display = 'block';
+                    loadAdminData();
                 }
             } else {
-                userDisplay.innerText = '';
-                authBtn.innerText = 'تسجيل دخول';
-                authBtn.setAttribute('onclick', "openModal('loginModal')");
-                adminNav.style.display = 'none';
-                switchView('store');
-            }
-
-            const filtered = appData.tools.filter(t => currentFilter === 'all' || t.category === currentFilter);
-            filtered.forEach(tool => {
-                grid.innerHTML += `
-                    <div class="card">
-                        <span class="card-tag">${tool.category}</span>
-                        <h3>${tool.name}</h3>
-                        <p>${tool.desc}</p>
-                        <div class="card-footer">
-                            <a href="${tool.filePath}" class="btn btn-primary" download><i class="fa-solid fa-download"></i> تحميل</a>
-                        </div>
-                    </div>
+                panel.innerHTML = `
+                    <button onclick="openModal(false)">تسجيل دخول</button>
+                    <button onclick="openModal(true)" style="background: transparent; border: 1px solid #38bdf8;">حساب جديد</button>
                 `;
-            });
-
-            appData.tools.forEach(tool => {
-                adminBody.innerHTML += `
-                    <tr>
-                        <td>${tool.name}</td>
-                        <td>${tool.category}</td>
-                        <td>${tool.fileName}</td>
-                        <td><button class="btn btn-danger" style="padding:4px 10px; font-size:0.8rem;" onclick="deleteTool(${tool.id})">حذف</button></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function filterCat(cat, btn) {
-            currentFilter = cat;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updateUI();
-        }
-
-        function switchView(view) {
-            document.getElementById('storeView').style.display = view === 'store' ? 'block' : 'none';
-            document.getElementById('adminView').classList.toggle('active', view === 'admin');
-        }
-
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        function switchToRegister() { closeModal('loginModal'); openModal('registerModal'); }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPass').value })
-            });
-            const data = await res.json();
-            if (data.success) { closeModal('loginModal'); initApp(); }
-            else { alert(data.message); }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, password: document.getElementById('regPass').value })
-            });
-            const data = await res.json();
-            if (data.success) { closeModal('registerModal'); initApp(); }
-            else { alert(data.message); }
-        }
-
-        async function handleLogout() {
-            await fetch('/api/logout', { method: 'POST' });
-            initApp();
-        }
-
-        async function handleAddTool(e) {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('name', document.getElementById('toolName').value);
-            formData.append('category', document.getElementById('toolCat').value);
-            formData.append('desc', document.getElementById('toolDesc').value);
-            formData.append('toolFile', document.getElementById('toolFile').files[0]);
-
-            const res = await fetch('/api/tools', { method: 'POST', body: formData });
-            const data = await res.json();
-            if (data.success) { closeModal('addToolModal'); initApp(); }
-        }
-
-        async function deleteTool(id) {
-            if (confirm('هل أنت متأكد من الحذف؟')) {
-                await fetch(`/api/tools/${id}`, { method: 'DELETE' });
-                initApp();
             }
         }
 
-        initApp();
+        function openModal(register) {
+            isRegisterMode = register;
+            document.getElementById('modalTitle').innerText = register ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        async function submitAuth() {
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const endpoint = isRegisterMode ? '/api/register' : '/api/login';
+
+            if (!username || !password) {
+                alert('الرجاء إدخال اسم المستخدم وكلمة المرور');
+                return;
+            }
+
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'حدث خطأ ما');
+            }
+        }
+
+        // عداد تنزيل الأدوات
+        async function downloadTool(toolName) {
+            await fetch('/api/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tool_name: toolName })
+            });
+            alert(`جاري تحميل ${toolName} بنجاح!`);
+            location.reload();
+        }
+
+        // جلب بيانات لوحة الأدمن (المستخدمين، الأيبي، الدول)
+        async function loadAdminData() {
+            const res = await fetch('/api/admin-data');
+            if (!res.ok) return;
+            const data = await res.json();
+
+            // تعبئة جدول السجلات (IP & Country)
+            const logsTable = document.getElementById('logsTable');
+            logsTable.innerHTML = data.logs.map(log => `
+                <tr>
+                    <td>${log.username}</td>
+                    <td>${log.ip}</td>
+                    <td>${log.country}</td>
+                    <td>${log.action}</td>
+                    <td>${log.time}</td>
+                </tr>
+            `).join('');
+
+            // تحديث عدادات التنزيلات في البطاقات
+            data.downloads.forEach(d => {
+                if (d.tool_name === 'أداة تحويل الملفات السريعة') document.getElementById('count-tool1').innerText = `عدد التنزيلات: ${d.count}`;
+                if (d.tool_name === 'أداة فحص الأمان والحماية') document.getElementById('count-tool2').innerText = `عدد التنزيلات: ${d.count}`;
+                if (d.tool_name === 'أداة تحليل البيانات والتقارير') document.getElementById('count-tool3').innerText = `عدد التنزيلات: ${d.count}`;
+            });
+        }
+
+        checkSession();
     </script>
 </body>
 </html>
